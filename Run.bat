@@ -65,6 +65,7 @@ for /r "%~dp0Resource" %%i in (nvda_20*.exe) do (
 )
 
 Rem 运行 NVDA
+"%~dp0Build\Temp\NVDA\nvda.exe" -c "%~dp0userConfig"
 if /i %NVDA% == On (
   if /i %PROCESSOR_IDENTIFIER:~0,3%==x86 (
     Start /D  "%ProgramFiles%\NVDA" NVDA
