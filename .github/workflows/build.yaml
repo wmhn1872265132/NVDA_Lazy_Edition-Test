@@ -204,7 +204,7 @@ jobs:
   gitcode_push:
     name: Push to GitCode
     if: ${{ startsWith(github.ref, 'refs/tags/') && vars.GITCODE_USERNAME }}
-    uses: nvdacn/sync_to_gitcode/.github/workflows/PushToGitCode.yaml@master
+    uses: nvdacn/sync_to_gitcode/.github/workflows/PushToGitCode.yaml@docs
     with:
       gitcode_username: ${{ vars.GITCODE_USERNAME }}
       gitcode_repository: ${{ vars.GITCODE_REPOSITORY }}
@@ -216,7 +216,7 @@ jobs:
     needs: 
       - gitcode_push
       - build
-    uses: nvdacn/sync_to_gitcode/.github/workflows/CreateReleaseOnGitCode.yaml@master
+    uses: nvdacn/sync_to_gitcode/.github/workflows/CreateReleaseOnGitCode.yaml@docs
     with:
       artifact_name: Archive
       gitcode_repository: ${{ vars.GITCODE_REPOSITORY }}
