@@ -218,12 +218,12 @@ jobs:
       - build
     uses: nvdacn/sync_to_gitcode/.github/workflows/CreateReleaseOnGitCode.yaml@master
     with:
-      artifact_name: *Enhancement*
+      artifact_name: '*Enhancement'
       gitcode_repository: ${{ vars.GITCODE_REPOSITORY }}
       tag_name: ${{ github.ref_name }}
       prerelease: ${{ contains(github.ref, 'beta') }}
       body: |
         详细更新日志请[点此查看](https://gitcode.com/${{ vars.GITCODE_REPOSITORY }}/blob/${{ github.ref_name }}/documentation/changes.md)。
-      file_name: *.*
+      file_name: '*.*'
     secrets:
       GITCODE_TOKEN: ${{ secrets.GITCODE_TOKEN }}
