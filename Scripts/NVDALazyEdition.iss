@@ -1,9 +1,11 @@
-﻿#define Version GetDateTimeString('yyyy.mm.dd', '.', '')
+﻿#include "common_defines.iss"
+#define LazyEditionEnv GetEnv("LazyEditionFilename")
+#define LazyEditionOutputName (LazyEditionEnv != "" ? LazyEditionEnv : "NVDA 懒人版")
 
 [Setup]
-VersionInfoVersion={#Version}
+VersionInfoVersion={#FinalVersion}
 AppName=NVDA 懒人版
-AppVerName=NVDA 懒人版-{#Version}
+AppVerName=NVDA 懒人版-{#BaseVersion}
 AppPublisher=NVDACN
 AppPublisherURL=https://www.nvdacn.com/
 AppSupportURL=https://github.com/nvdacn/NVDA_Lazy_Edition
@@ -11,7 +13,7 @@ AppUpdatesURL=https://github.com/nvdacn/NVDA_Lazy_Edition/releases
 DefaultDirName={userappdata}\NVDA
 AllowNoIcons=yes
 OutputDir=..\Build
-OutputBaseFilename=NVDA 懒人版
+OutputBaseFilename={#LazyEditionOutputName}
 Compression=none
 DisableDirPage=Yes
 DisableProgramGroupPage=yes
@@ -24,8 +26,9 @@ WizardImageFile=..\userConfig\Image.bmp
 WizardSmallImageFile=..\userConfig\Image.bmp
 LicenseFile=..\Build\Temp\NVDA\documentation\copying.txt
 InfoBeforeFile=..\Build\说明.txt
-MinVersion=6.03
-ArchitecturesInstallIn64BitMode=x64 ia64 arm64
+MinVersion=10.0
+ArchitecturesAllowed=x64 arm64
+ArchitecturesInstallIn64BitMode=x64 arm64
 AllowCancelDuringInstall=No
 AlwaysShowComponentsList=No
 ShowComponentSizes=No
@@ -34,11 +37,11 @@ RestartIfNeededByRun=no
 ShowLanguageDialog=No
 
 [Languages]
-Name: "english"; MessagesFile: "compiler:Languages\English.isl"
-Name: "chinesesimp"; MessagesFile: "compiler:Default.isl"
+Name: "english"; MessagesFile: {#EnglishMessages}
+Name: "chinesesimp"; MessagesFile: {#ChineseSimplifiedMessages}
 
 [Messages]
-ReadyLabel2a=单击“安装”以开始安装进程。
+ReadyLabel2a=点击“安装”以开始安装进程。
 FinishedHeadingLabel=[name] 安装向导完成，请手动启动 NVDA 已开始使用
 
 [Types]
@@ -51,38 +54,38 @@ Name: "custom"; Description: "自定义安装"; Flags: iscustom
 Name: "Settings"; Types: Full default compact custom; Description: "修改部分 NVDA 设置"; Check: not FileExists(ExpandConstant('{userappdata}\NVDA\nvda.ini'))
 Name: "Settings"; Description: "修改部分 NVDA 设置"; Check: FileExists(ExpandConstant('{userappdata}\NVDA\nvda.ini'))
 Name: "Voices"; Types: Full default custom; Description: "语音引擎";
+Name: "Voices\VocalizerExpressive2"; Types: Full default custom; Flags: disablenouninstallwarning; Description: "Nuance Vocalizer expressive 2.2 语音引擎"
 Name: "Voices\VVTTS"; Types: Full custom; Description: "VVTTS 语音引擎"
 Name: "Voices\AiSound5"; Types: Full custom; Description: "AiSound5 语音引擎"
-Name: "Voices\WorldVoice"; Types: Full default custom; Description: "WorldVoice （Vocalizer Expressive 语音）"
 Name: "Addons"; Types: Full default custom; Flags: disablenouninstallwarning; Description: "可选插件"
 Name: "Addons\Access8Math"; Types: Full custom; Flags: disablenouninstallwarning; Description: "Access8Math"
 Name: "Addons\addonsHelp"; Types: Full custom; Flags: disablenouninstallwarning; Description: "插件文档"
 Name: "Addons\addonsTools"; Types: Full custom; Flags: disablenouninstallwarning; Description: "插件管理工具箱"
-Name: "Addons\audioManager"; Types: Full default custom; Flags: disablenouninstallwarning; Description: "音频管理器"; MinVersion: 10.0
+Name: "Addons\audioManager"; Types: Full default custom; Flags: disablenouninstallwarning; Description: "音频管理器"
 Name: "Addons\clipboardEnhancement"; Types: Full default custom; Flags: disablenouninstallwarning; Description: "剪贴板朗读增强"
 Name: "Addons\DragAndDrop"; Types: Full custom; Flags: disablenouninstallwarning; Description: "DragAndDrop （对象拖放）"
 Name: "Addons\goldenCursor"; Types: Full default custom; Flags: disablenouninstallwarning; Description: "金色光标"
 Name: "Addons\imeExpressive"; Types: Full default custom; Flags: disablenouninstallwarning; Description: "中文输入法支持"
 Name: "Addons\inputLock"; Types: Full custom; Flags: disablenouninstallwarning; Description: "输入锁"
-Name: "Addons\instantTranslate"; Types: Full default custom; Flags: disablenouninstallwarning; Description: "及时翻译"
+Name: "Addons\leanCalendar"; Types: Full default custom; Flags: disablenouninstallwarning; Description: "简易万年历"
 Name: "Addons\NumberProcessing"; Types: Full custom; Flags: disablenouninstallwarning; Description: "数字处理"
 Name: "Addons\objWatcher"; Types: Full default custom; Flags: disablenouninstallwarning; Description: "对象监视器"
+Name: "Addons\polyglot"; Types: Full default custom; Flags: disablenouninstallwarning; Description: "Polyglot"
 Name: "Addons\QQEnhancement"; Types: Full default custom; Flags: disablenouninstallwarning; Description: "PC QQ增强"
 Name: "Addons\resourceMonitor"; Types: Full default custom; Flags: disablenouninstallwarning; Description: "资源监控器"
 Name: "Addons\unmute"; Types: Full custom; Flags: disablenouninstallwarning; Description: "取消系统静音"
 Name: "Addons\WeChatEnhancement"; Types: Full default custom; Flags: disablenouninstallwarning; Description: "PC微信增强"
+Name: "Addons\winFormsNet48Fixes"; Types: Full default custom; Flags: disablenouninstallwarning; Description: "WinForms .NET 4.8 修复"
 Name: "Addons\withSounds"; Types: Full custom; Flags: disablenouninstallwarning; Description: "withSounds（用音效替换链接角色、删除已访问提示）"
 Name: "Addons\xyOCR"; Types: Full default custom; Flags: disablenouninstallwarning; Description: "新翼OCR"
 
 [Tasks]
 Name: "StartOnLogon"; Description: "在欢迎界面启用 NVDA"
 Name: "FixAudioDucking"; Description: "修复音频闪避等功能无法使用"; Flags: Unchecked
-Name: "Voices"; Description: "语音合成器设置"; Components: Settings; OnlyBelowVersion: 10.0
-Name: "Voices"; Description: "语音合成器设置"; Components: Settings and Voices; Flags: Unchecked; MinVersion: 10.0
-Name: "Voices\WorldVoice"; Description: "切换语音合成器到 WorldVoice"; Components: Voices\WorldVoice; Flags: exclusive
+Name: "Voices"; Description: "语音合成器设置"; Components: Settings and Voices; Flags: Unchecked
+Name: "Voices\VocalizerExpressive2"; Description: "切换语音合成器到 Nuance Vocalizer expressive 2.2"; Components: Voices\VocalizerExpressive2; Flags: exclusive
 Name: "Voices\AiSound5"; Description: "切换语音合成器到 AiSound5"; Components: Voices\AiSound5; Flags: exclusive Unchecked
 Name: "Voices\sapi4"; Description: "切换语音合成器到 Microsoft Speech API version 4 已使用 VVTTS 引擎"; Components: Voices\VVTTS; Flags: exclusive Unchecked
-Name: "Voices\sapi5"; Description: "切换语音合成器到 Microsoft Speech API version 5"; OnlyBelowVersion: 10.0; Components: Settings; Flags: exclusive
 Name: "VVTTSDicts"; Description: "导入 VVTTS 语音字典（仅用于 SAPI4）"; Components: Settings and Voices\VVTTS; Check: not FileExists(ExpandConstant('{userappdata}\NVDA\speechDicts\voiceDicts.v1\sapi4\sapi4-中文-简体_ Default (SimplifiedChinese) - IBM ViaVoice Text-to-Speech.dic'))
 Name: "VVTTSDicts"; Description: "导入 VVTTS 语音字典（仅用于 SAPI4）"; Components: Settings and Voices\VVTTS; Flags: Unchecked; Check: FileExists(ExpandConstant('{userappdata}\NVDA\speechDicts\voiceDicts.v1\sapi4\sapi4-中文-简体_ Default (SimplifiedChinese) - IBM ViaVoice Text-to-Speech.dic'))
 Name: "DeleteProfile"; Description: "清空用户配置文件夹"; Check: FileExists(ExpandConstant('{userappdata}\NVDA\nvda.ini')); Flags: Unchecked
@@ -99,7 +102,8 @@ procedure BackupNVDAProfile();
 begin
 ExtractTemporaryFile(ExtractFileName(ExpandConstant('{tmp}\7z.dll')));
 ExtractTemporaryFile(ExtractFileName(ExpandConstant('{tmp}\7z.exe')));
-Exec(ExpandConstant('{tmp}\7z.exe'), ' a -y -tzip "'+ ExpandConstant('{userdocs}')+ '\NVDABackup\NVDABackup.zip" "'+ ExpandConstant('{userappdata}\NVDA')+'\*"', '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode);
+DelTree(ExpandConstant('{userdocs}\NVDA_Lazy_Edition_Backup'), True, True, True);
+Exec(ExpandConstant('{tmp}\7z.exe'), ' a -y -tzip "'+ ExpandConstant('{userdocs}')+ '\NVDA_Lazy_Edition_Backup\NVDA_Lazy_Edition_Backup.zip" "'+ ExpandConstant('{userappdata}\NVDA')+'\*"', '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode);
 end;
 
 // 非简体中文操作系统时的错误对话框
@@ -117,12 +121,12 @@ function CHSUI: Boolean;
 begin
   If not FileExists(ExpandConstant('{userappdata}\NVDA\nvda.ini')) Then
   begin
-    ResultCode := SuppressibleMsgBox('欢迎使用 NVDA 懒人版。' #13#13 '本程序可自动为您安装 NVDA 主程序及部分常用插件。' #13#13 '程序检测到您未安装 NVDA 或尚未对其进行配置，您可选择快速安装模式以自动安装和配置 NVDA。' #13#13 '您要执行快速安装吗？' #13#13 '单击“是”执行快速安装，单击“否”执行高级安装，单击“取消”退出本程序。', mbConfirmation, MB_YESNOCANCEL or MB_DEFBUTTON1, IDNO)
+    ResultCode := SuppressibleMsgBox('欢迎使用 NVDA 懒人版。' #13#13 '本程序可自动为您安装 NVDA 主程序及部分常用插件。' #13#13 '程序检测到您未安装 NVDA 或尚未对其进行配置，您可选择快速安装模式以自动安装和配置 NVDA。' #13#13 '您要执行快速安装吗？' #13#13 '点击“是”执行快速安装，点击“否”执行高级安装，点击“取消”退出本程序。', mbConfirmation, MB_YESNOCANCEL or MB_DEFBUTTON1, IDNO)
   end else begin
-    ResultCode := SuppressibleMsgBox('欢迎使用 NVDA 懒人版。' #13#13 '本程序可自动为您安装 NVDA 主程序及部分常用插件。' #13#13 '程序检测到您的 NVDA 配置文件夹中存在 NVDA配置文件，保留该配置继续安装，某些文件可能不会被替换。' #13#13 '您要清除该配置吗？' #13#13 '单击“是”清空 NVDA 配置文件夹，单击“否”保留配置并执行高级安装，单击“取消”退出本程序。', mbConfirmation, MB_YESNOCANCEL or MB_DEFBUTTON1, IDNO)
+    ResultCode := SuppressibleMsgBox('欢迎使用 NVDA 懒人版。' #13#13 '本程序可自动为您安装 NVDA 主程序及部分常用插件。' #13#13 '程序检测到您的 NVDA 配置文件夹中存在 NVDA配置文件，保留该配置继续安装，某些文件可能不会被替换。' #13#13 '您要清除该配置吗？' #13#13 '点击“是”清空 NVDA 配置文件夹，点击“否”保留配置并执行高级安装，点击“取消”退出本程序。', mbConfirmation, MB_YESNOCANCEL or MB_DEFBUTTON1, IDNO)
     If ResultCode=IDYES Then
     begin
-      ResultCode := SuppressibleMsgBox('您要备份现有的 NVDA 配置吗？' #13#13 '备份的文件将被存储在 '+ ExpandConstant('{userdocs}\NVDABackup')+ ' 文件夹中。' #13#13 '单击“是”备份并清空现有配置文件夹，单击“否”直接清空现有配置文件夹，单击“取消”保留配置并执行高级安装。', mbConfirmation, MB_YESNOCANCEL or MB_DEFBUTTON1, IDYES)
+      ResultCode := SuppressibleMsgBox('您要备份现有的 NVDA 配置吗？' #13#13 '备份的文件将被存储在 '+ ExpandConstant('{userdocs}\NVDA_Lazy_Edition_Backup')+ ' 文件夹中。' #13#13 '同时会删除此前的配置备份文件。' #13#13 '点击“是”备份并清空现有配置文件夹，点击“否”直接清空现有配置文件夹，点击“取消”保留配置并执行高级安装。', mbConfirmation, MB_YESNOCANCEL or MB_DEFBUTTON1, IDYES)
       If ResultCode=IDCANCEL Then
       begin
         ResultCode := IDNO;
@@ -132,7 +136,7 @@ begin
 BackupNVDAProfile();
         end;
         DelTree(ExpandConstant('{userappdata}\NVDA'), True, True, True);
-        ResultCode := SuppressibleMsgBox('程序已清空您现有的 NVDA 配置文件夹，现在您可选择快速安装模式以自动安装和配置 NVDA。' #13#13 '您要执行快速安装吗？' #13#13 '单击“是”执行快速安装，单击“否”执行高级安装，单击“取消”退出本程序。', mbConfirmation, MB_YESNOCANCEL or MB_DEFBUTTON1, IDNO)
+        ResultCode := SuppressibleMsgBox('程序已清空您现有的 NVDA 配置文件夹，现在您可选择快速安装模式以自动安装和配置 NVDA。' #13#13 '您要执行快速安装吗？' #13#13 '点击“是”执行快速安装，点击“否”执行高级安装，点击“取消”退出本程序。', mbConfirmation, MB_YESNOCANCEL or MB_DEFBUTTON1, IDNO)
       end;
     end;
   end;
@@ -219,14 +223,14 @@ end;
 [ini]
 FileName: "{app}\NVDA.ini"; Section: "speech"; Key: "	synth "; String: " aisound"; Tasks: "Voices\AiSound5"
 FileName: "{app}\NVDA.ini"; Section: "speech"; Key: "	synth "; String: " sapi4"; Tasks: "Voices\sapi4"
-FileName: "{app}\NVDA.ini"; Section: "speech"; Key: "	synth "; String: " sapi5"; Tasks: "Voices\sapi5"
-FileName: "{app}\NVDA.ini"; Section: "speech"; Key: "	synth "; String: " WorldVoice"; Tasks: "Voices\WorldVoice"
+FileName: "{app}\NVDA.ini"; Section: "speech"; Key: "	synth "; String: " vocalizer_expressive2"; Tasks: "Voices\VocalizerExpressive2"
 
 [InstallDelete]
 Type: filesandordirs; Name: "{userappdata}\NVDA\*"; Tasks: DeleteProfile\Backup; BeforeInstall: BackupNVDAProfile();
 Type: filesandordirs; Name: "{userappdata}\NVDA\*"; Tasks: DeleteProfile\NoBackup
+Type: filesandordirs; Name: "{app}\Addons\vocalizer_expressive2_driver"; Tasks: "not DeleteProfile"; Components: "Voices\VocalizerExpressive2"
+Type: filesandordirs; Name: "{app}\Addons\vocalizer-expressive2-voice-zh-en-Compact"; Tasks: "not DeleteProfile"; Components: "Voices\VocalizerExpressive2"
 Type: filesandordirs; Name: "{app}\Addons\AiSound5"; Tasks: "not DeleteProfile"; Components: "Voices\AiSound5"
-Type: filesandordirs; Name: "{app}\Addons\WorldVoice"; Tasks: "not DeleteProfile"; Components: "Voices\WorldVoice"
 Type: filesandordirs; Name: "{app}\Addons\Access8Math"; Tasks: "not DeleteProfile"; Components: "Addons\Access8Math"
 Type: filesandordirs; Name: "{app}\Addons\addonsHelp"; Tasks: "not DeleteProfile"; Components: "Addons\addonsHelp"
 Type: filesandordirs; Name: "{app}\Addons\addonsTools"; Tasks: "not DeleteProfile"; Components: "Addons\addonsTools"
@@ -242,17 +246,19 @@ Type: files; Name: "{app}\Addons\goldenCursor\installTasks.py"; Tasks: "not Dele
 Type: files; Name: "{app}\Addons\goldenCursor\manifest.ini"; Tasks: "not DeleteProfile"; Components: "Addons\goldenCursor"
 Type: filesandordirs; Name: "{app}\Addons\ime_expressive"; Tasks: "not DeleteProfile"; Components: "Addons\imeExpressive"
 Type: filesandordirs; Name: "{app}\Addons\inputLock"; Tasks: "not DeleteProfile"; Components: "Addons\inputLock"
-Type: filesandordirs; Name: "{app}\Addons\instantTranslate"; Tasks: "not DeleteProfile"; Components: "Addons\instantTranslate"
+Type: filesandordirs; Name: "{app}\Addons\leanCalendar"; Tasks: "not DeleteProfile"; Components: "Addons\leanCalendar"
 Type: filesandordirs; Name: "{app}\Addons\numberProcessing"; Tasks: "not DeleteProfile"; Components: "Addons\numberProcessing"
 Type: filesandordirs; Name: "{app}\Addons\objWatcher"; Tasks: "not DeleteProfile"; Components: "Addons\objWatcher"
+Type: filesandordirs; Name: "{app}\Addons\polyglot"; Tasks: "not DeleteProfile"; Components: "Addons\polyglot"
 Type: filesandordirs; Name: "{app}\Addons\QQEnhancement"; Tasks: "not DeleteProfile"; Components: "Addons\QQEnhancement"
 Type: filesandordirs; Name: "{app}\Addons\resourceMonitor"; Tasks: "not DeleteProfile"; Components: "Addons\resourceMonitor"
 Type: filesandordirs; Name: "{app}\Addons\unmute"; Tasks: "not DeleteProfile"; Components: "Addons\unmute"
 Type: filesandordirs; Name: "{app}\Addons\WeChatEnhancement"; Tasks: "not DeleteProfile"; Components: "Addons\WeChatEnhancement"
+Type: filesandordirs; Name: "{app}\Addons\winFormsNet48Fixes"; Tasks: "not DeleteProfile"; Components: "Addons\winFormsNet48Fixes"
 Type: filesandordirs; Name: "{app}\Addons\withSounds"; Tasks: "not DeleteProfile"; Components: "Addons\withSounds"
 Type: filesandordirs; Name: "{app}\Addons\xyOCR"; Tasks: "not DeleteProfile"; Components: "Addons\xyOCR"
+Type: files; Name: "{app}\Addons\vocalizer_expressive2_driver.json"; Tasks: "not DeleteProfile"; Components: "Voices\VocalizerExpressive2"
 Type: files; Name: "{app}\Addons\AiSound5.json"; Tasks: "not DeleteProfile"; Components: "Voices\AiSound5"
-Type: files; Name: "{app}\Addons\WorldVoice.json"; Tasks: "not DeleteProfile"; Components: "Voices\WorldVoice"
 Type: files; Name: "{app}\Addons\Access8Math.json"; Tasks: "not DeleteProfile"; Components: "Addons\Access8Math"
 Type: files; Name: "{app}\Addons\addonsHelp.json"; Tasks: "not DeleteProfile"; Components: "Addons\addonsHelp"
 Type: files; Name: "{app}\Addons\addonsTools.json"; Tasks: "not DeleteProfile"; Components: "Addons\addonsTools"
@@ -262,13 +268,15 @@ Type: files; Name: "{app}\Addons\DragAndDrop.json"; Tasks: "not DeleteProfile"; 
 Type: files; Name: "{app}\Addons\goldenCursor.json"; Tasks: "not DeleteProfile"; Components: "Addons\goldenCursor"
 Type: files; Name: "{app}\Addons\ime_expressive.json"; Tasks: "not DeleteProfile"; Components: "Addons\imeExpressive"
 Type: files; Name: "{app}\Addons\inputLock.json"; Tasks: "not DeleteProfile"; Components: "Addons\inputLock"
-Type: files; Name: "{app}\Addons\instantTranslate.json"; Tasks: "not DeleteProfile"; Components: "Addons\instantTranslate"
+Type: files; Name: "{app}\Addons\leanCalendar.json"; Tasks: "not DeleteProfile"; Components: "Addons\leanCalendar"
 Type: files; Name: "{app}\Addons\numberProcessing.json"; Tasks: "not DeleteProfile"; Components: "Addons\numberProcessing"
 Type: files; Name: "{app}\Addons\objWatcher.json"; Tasks: "not DeleteProfile"; Components: "Addons\objWatcher"
+Type: files; Name: "{app}\Addons\polyglot.json"; Tasks: "not DeleteProfile"; Components: "Addons\polyglot"
 Type: files; Name: "{app}\Addons\QQEnhancement.json"; Tasks: "not DeleteProfile"; Components: "Addons\QQEnhancement"
 Type: files; Name: "{app}\Addons\resourceMonitor.json"; Tasks: "not DeleteProfile"; Components: "Addons\resourceMonitor"
 Type: files; Name: "{app}\Addons\unmute.json"; Tasks: "not DeleteProfile"; Components: "Addons\unmute"
 Type: files; Name: "{app}\Addons\WeChatEnhancement.json"; Tasks: "not DeleteProfile"; Components: "Addons\WeChatEnhancement"
+Type: files; Name: "{app}\Addons\winFormsNet48Fixes.json"; Tasks: "not DeleteProfile"; Components: "Addons\winFormsNet48Fixes"
 Type: files; Name: "{app}\Addons\withSounds.json"; Tasks: "not DeleteProfile"; Components: "Addons\withSounds"
 Type: files; Name: "{app}\Addons\xyOCR.json"; Tasks: "not DeleteProfile"; Components: "Addons\xyOCR"
 
@@ -279,12 +287,8 @@ Filename: "{tmp}\NVDAPortable\nvda"; Parameters: "-ms"; Flags: nowait
 Filename: "{tmp}\spchapi"; Parameters: "/Q"; Components: "Voices\VVTTS"
 Filename: "{tmp}\VVTTS"; Parameters: "/verysilent /suppressmsgboxes /nocancel /norestart /nocloseapplications"; Components: "Voices\VVTTS"
 Filename: "{tmp}\7z"; Parameters: "x ""Addons\AiSound5*.nvda-addon"" -aoa -o""{app}\Addons\AiSound5"""; Components: "Voices\AiSound5"; AfterInstall: JSONFile('AiSound5')
-Filename: "{tmp}\7z"; Parameters: "x ""aisound.zip"" -aoa -o""{app}\Addons\AiSound5\synthDrivers"""; Components: "Voices\AiSound5"
-Filename: "{tmp}\vcredist_x86"; Parameters: "/install /quiet /norestart"; Components: "Voices\WorldVoice"
-Filename: "{tmp}\7z"; Parameters: "x ""Addons\WorldVoice*.nvda-addon"" -aoa -o""{app}\Addons\WorldVoice"""; Components: "Voices\WorldVoice"; AfterInstall: JSONFile('WorldVoice')
-Filename: "{tmp}\7z"; Parameters: "x ""aisound.zip"" -aoa -o""{app}\WorldVoice-workspace\aisound"""; Components: "Voices\WorldVoice"
-Filename: "{tmp}\7z"; Parameters: "x ""VE.zip"" -aoa -o""{app}\WorldVoice-workspace\VE"""; Components: "Voices\WorldVoice"
-Filename: "{tmp}\7z"; Parameters: "x ""voice.zip"" -aoa -o""{app}\WorldVoice-workspace"""; Components: "Voices\WorldVoice"
+Filename: "{tmp}\7z"; Parameters: "x ""Addons\vocalizer_expressive2_driver*.nvda-addon"" -aoa -o""{app}\Addons\vocalizer_expressive2_driver"""; Components: "Voices\VocalizerExpressive2"; AfterInstall: JSONFile('vocalizer_expressive2_driver')
+Filename: "{tmp}\7z"; Parameters: "x ""Addons\vocalizer-expressive2-voice-zh-en-Compact*.nvda-addon"" -aoa -o""{app}\Addons\vocalizer-expressive2-voice-zh-en-Compact"""; Components: "Voices\VocalizerExpressive2"
 Filename: "{tmp}\7z"; Parameters: "x ""Addons\Access8Math*.nvda-addon"" -aoa -o""{app}\Addons\Access8Math"""; Components: "Addons\Access8Math"; AfterInstall: JSONFile('Access8Math')
 Filename: "{tmp}\7z"; Parameters: "x ""Addons\addonsHelp*.nvda-addon"" -aoa -o""{app}\Addons\addonsHelp"""; Components: "Addons\addonsHelp"; AfterInstall: JSONFile('addonsHelp')
 Filename: "{tmp}\7z"; Parameters: "x ""Addons\addonsTools*.nvda-addon"" -aoa -o""{app}\Addons\addonsTools"""; Components: "Addons\addonsTools"; AfterInstall: JSONFile('addonsTools')
@@ -294,29 +298,29 @@ Filename: "{tmp}\7z"; Parameters: "x ""Addons\DragAndDrop*.nvda-addon"" -aoa -o"
 Filename: "{tmp}\7z"; Parameters: "x ""Addons\goldenCursor*.nvda-addon"" -aoa -o""{app}\Addons\goldenCursor"""; Components: "Addons\goldenCursor"; AfterInstall: JSONFile('goldenCursor')
 Filename: "{tmp}\7z"; Parameters: "x ""Addons\ime_expressive*.nvda-addon"" -aoa -o""{app}\Addons\ime_expressive"""; Components: "Addons\imeExpressive"; AfterInstall: JSONFile('ime_expressive')
 Filename: "{tmp}\7z"; Parameters: "x ""Addons\inputLock*.nvda-addon"" -aoa -o""{app}\Addons\inputLock"""; Components: "Addons\inputLock"; AfterInstall: JSONFile('inputLock')
-Filename: "{tmp}\7z"; Parameters: "x ""Addons\instantTranslate*.nvda-addon"" -aoa -o""{app}\Addons\instantTranslate"""; Components: "Addons\instantTranslate"; AfterInstall: JSONFile('instantTranslate')
+Filename: "{tmp}\7z"; Parameters: "x ""Addons\leanCalendar*.nvda-addon"" -aoa -o""{app}\Addons\leanCalendar"""; Components: "Addons\leanCalendar"; AfterInstall: JSONFile('leanCalendar')
 Filename: "{tmp}\7z"; Parameters: "x ""Addons\numberProcessing*.nvda-addon"" -aoa -o""{app}\Addons\numberProcessing"""; Components: "Addons\numberProcessing"; AfterInstall: JSONFile('numberProcessing')
 Filename: "{tmp}\7z"; Parameters: "x ""Addons\objWatcher*.nvda-addon"" -aoa -o""{app}\Addons\objWatcher"""; Components: "Addons\objWatcher"; AfterInstall: JSONFile('objWatcher')
+Filename: "{tmp}\7z"; Parameters: "x ""Addons\polyglot*.nvda-addon"" -aoa -o""{app}\Addons\polyglot"""; Components: "Addons\polyglot"; AfterInstall: JSONFile('polyglot')
 Filename: "{tmp}\7z"; Parameters: "x ""Addons\QQEnhancement*.nvda-addon"" -aoa -o""{app}\Addons\QQEnhancement"""; Components: "Addons\QQEnhancement"; AfterInstall: JSONFile('QQEnhancement')
 Filename: "{tmp}\7z"; Parameters: "x ""Addons\resourceMonitor*.nvda-addon"" -aoa -o""{app}\Addons\resourceMonitor"""; Components: "Addons\resourceMonitor"; AfterInstall: JSONFile('resourceMonitor')
 Filename: "{tmp}\7z"; Parameters: "x ""Addons\unmute*.nvda-addon"" -aoa -o""{app}\Addons\unmute"""; Components: "Addons\unmute"; AfterInstall: JSONFile('unmute')
 Filename: "{tmp}\7z"; Parameters: "x ""Addons\WeChatEnhancement*.nvda-addon"" -aoa -o""{app}\Addons\WeChatEnhancement"""; Components: "Addons\WeChatEnhancement"; AfterInstall: JSONFile('WeChatEnhancement')
+Filename: "{tmp}\7z"; Parameters: "x ""Addons\winFormsNet48Fixes*.nvda-addon"" -aoa -o""{app}\Addons\winFormsNet48Fixes"""; Components: "Addons\winFormsNet48Fixes"; AfterInstall: JSONFile('winFormsNet48Fixes')
 Filename: "{tmp}\7z"; Parameters: "x ""Addons\withSounds*.nvda-addon"" -aoa -o""{app}\Addons\withSounds"""; Components: "Addons\withSounds"; AfterInstall: JSONFile('withSounds')
 Filename: "{tmp}\7z"; Parameters: "x ""Addons\xyOCR*.nvda-addon"" -aoa -o""{app}\Addons\xyOCR"""; Components: "Addons\xyOCR"; AfterInstall: JSONFile('xyOCR')
 
 [Files]
 Source: "..\Build\Temp\NVDAPortable.exe"; DestDir: "{tmp}"; Flags: dontcopy deleteafterinstall
-Source: "..\Tools\7Zip\*"; DestDir: "{tmp}"; Flags: deleteafterinstall ignoreversion recursesubdirs createallsubdirs
+Source: {#SevenZipDll}; DestDir: "{tmp}"; Flags: deleteafterinstall ignoreversion
+Source: {#SevenZipExe}; DestDir: "{tmp}"; Flags: deleteafterinstall ignoreversion
 Source: "..\userConfig\nvda.ini"; DestDir: "{app}"; Components: "Settings"; Flags: ignoreversion
 Source: "..\userConfig\sapi4-中文-简体_ Default (SimplifiedChinese) - IBM ViaVoice Text-to-Speech.dic"; DestDir: "{app}\speechDicts\voiceDicts.v1\sapi4"; Tasks: "VVTTSDicts"; Flags: ignoreversion
 Source: "..\Resource\speech\spchapi.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall ignoreversion; Components: "Voices\VVTTS"
 Source: "..\Resource\speech\IBM_ViaVoice_TTS_Runtime.exe"; DestDir: "{tmp}"; DestName: "VVTTS.exe"; Flags: deleteafterinstall ignoreversion; Components: "Voices\VVTTS"
-Source: "..\Resource\speech\aisound.zip"; DestDir: "{tmp}"; Flags: deleteafterinstall ignoreversion; Components: "Voices\AiSound5 or Voices\WorldVoice"
-Source: "..\Resource\vcredist_x86.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall ignoreversion; Components: "Voices\WorldVoice"
-Source: "..\Resource\speech\VE.zip"; DestDir: "{tmp}"; Flags: deleteafterinstall ignoreversion; Components: "Voices\WorldVoice"
-Source: "..\Resource\speech\voice.zip"; DestDir: "{tmp}"; Flags: deleteafterinstall ignoreversion; Components: "Voices\WorldVoice"
 Source: "..\Resource\Addons\AiSound5*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Voices\AiSound5"
-Source: "..\Resource\Addons\WorldVoice*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Voices\WorldVoice"
+Source: "..\Resource\Addons\vocalizer_expressive2_driver*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Voices\VocalizerExpressive2"
+Source: "..\Resource\Addons\vocalizer-expressive2-voice-zh-en-Compact*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Voices\VocalizerExpressive2"
 Source: "..\Resource\Addons\Access8Math*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\Access8Math"
 Source: "..\Resource\Addons\addonsHelp*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\addonsHelp"
 Source: "..\Resource\Addons\addonsTools*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\addonsTools"
@@ -326,13 +330,15 @@ Source: "..\Resource\Addons\DragAndDrop*"; DestDir: "{tmp}\Addons"; Flags: delet
 Source: "..\Resource\Addons\goldenCursor*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\goldenCursor"
 Source: "..\Resource\Addons\ime_expressive*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\imeExpressive"
 Source: "..\Resource\Addons\inputLock*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\inputLock"
-Source: "..\Resource\Addons\instantTranslate*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\instantTranslate"
+Source: "..\Resource\Addons\leanCalendar*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\leanCalendar"
 Source: "..\Resource\Addons\numberProcessing*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\numberProcessing"
 Source: "..\Resource\Addons\objWatcher*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\objWatcher"
+Source: "..\Resource\Addons\polyglot*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\polyglot"
 Source: "..\Resource\Addons\QQEnhancement*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\QQEnhancement"
 Source: "..\Resource\Addons\resourceMonitor*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\resourceMonitor"
 Source: "..\Resource\Addons\unmute*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\unmute"
 Source: "..\Resource\Addons\WeChatEnhancement*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\WeChatEnhancement"
+Source: "..\Resource\Addons\winFormsNet48Fixes*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\winFormsNet48Fixes"
 Source: "..\Resource\Addons\withSounds*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\withSounds"
 Source: "..\Resource\Addons\xyOCR*"; DestDir: "{tmp}\Addons"; Flags: deleteafterinstall ignoreversion; Components: "Addons\xyOCR"
 

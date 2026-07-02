@@ -13,53 +13,37 @@ on:
   workflow_dispatch:
 
 env:
-  GITCODE_REPOSITORY: ${{ vars.GITCODE_REPOSITORY || github.repository }}
+  BetaVersion: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && !contains(github.ref, 'beta') && 'False' || 'True' }}
 
 jobs:
   download-files:
     name: Download ${{ matrix.file.Name }}
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         file:
-          - Name: DragAndDrop-2.2.2dev.nvda-addon
-            URL: https://github.com/javidominguez/DragAndDrop/releases/download/2.2.2dev/DragAndDrop-2.2.2dev.nvda-addon
-            sha256: 7dc49d21be2c55ef340f3e67d650d2696df499765179e3f460ffac944632763e
-          - Name: vcredist_x86.exe
-            URL: https://dl.nvdacn.com/Share/vcredist_x86.exe
-            sha256: B924AD8062EAF4E70437C8BE50FA612162795FF0839479546CE907FFA8D6E386
-          - Name: aisound.zip
-            URL: https://dl.nvdacn.com/NVDA-Addons/TTS/VocalizerVoice/aisound.zip
-            sha256: B4FE1BED8F699179C8FF00F7B6F85AF4FF190ADCE1CCDB6C08132F93B7341EB2
-            prefix: speech-
-          - Name: VE.zip
-            URL: https://dl.nvdacn.com/NVDA-Addons/TTS/VocalizerVoice/VE.zip
-            sha256: 35ACAC34551ED8288DC6185A33127F5109AD6CB8901B329667C095DC0085EDD3
-            prefix: speech-
-          - Name: voice.zip
-            URL: https://dl.nvdacn.com/Share/voice.zip
-            sha256: AB2D6AFD7C5E12901DD3DA3CDC29325AA11A9DAB2EAC608D7B731993B2066450
-            prefix: speech-
+          - Name: vocalizer_expressive2_driver.nvda-addon
+            URL: https://gitcode.com/nvdacn/NVDA_resource_files/releases/download/vocalizer_expressive2_driver-2026.6.6-2606131647/vocalizer_expressive2_driver-2026.6.6.nvda-addon
+            sha256: E52E0A6CFA1714E217E988F27007EF2E1757706C872877117076233D52D6E98B
+          - Name: vocalizer-expressive2-voice-zh-en-Compact-2.2.nvda-addon
+            URL: https://gitcode.com/nvdacn/NVDA_resource_files/releases/download/vocalizer-expressive2-voice-zh-en-Compact-2.2-2606131654/vocalizer-expressive2-voice-zh-en-Compact-2.2.nvda-addon
+            sha256: 0068fe40392dbe9339c84536dffd54641ff54ab37af7044d64d4653ff0335073
           - Name: spchapi.exe
-            URL: https://dl.nvdacn.com/NVDA-Addons/TTS/spchapi.exe
+            URL: https://gitcode.com/nvdacn/NVDA_resource_files/releases/download/spchapi-2606131658/spchapi.exe
             sha256: 4fe6f9be7a75d649e2d484069c3626d30345e746e565f0b7b1fcff34ef223a2c
             prefix: speech-
           - Name: IBM_ViaVoice_TTS_Runtime.exe
-            URL: https://dl.nvdacn.com/NVDA-Addons/TTS/IBMViaVoiceTTSRuntime.exe
+            URL: https://gitcode.com/nvdacn/NVDA_resource_files/releases/download/IBM_ViaVoice_TTS_Runtime-2606131657/IBM_ViaVoice_TTS_Runtime.exe
             sha256: 0f9e8a998f0bf62513961fe0cb68bc50e06440a6d8e45e8ce6e073e332104255
             prefix: speech-
-    steps:
-      - name: Download ${{ matrix.file.Name }}
-        uses: nvdacn/NVDA_Lazy_Edition/.github/actions/DownloadResource@master
-        with:
-          file-name: ${{ matrix.file.Name }}
-          file-url: ${{ matrix.file.URL }}
-          file-sha256: ${{ matrix.file.sha256 }}
-          prefix: ${{ matrix.file.prefix }}
+    uses: ./.github/workflows/DownloadResource.yaml
+    with:
+      file-name: ${{ matrix.file.Name }}
+      file-url: ${{ matrix.file.URL }}
+      file-sha256: ${{ matrix.file.sha256 }}
+      prefix: ${{ matrix.file.prefix }}
 
   download-addons-from-addonStore:
     name: Download ${{ matrix.addon.addonId }} from Addon Store
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         addon:
@@ -69,109 +53,123 @@ jobs:
           - addonId: AiSound5
           - addonId: audioManager
           - addonId: clipboardEnhancement
+          - addonId: DragAndDrop
+            channel: dev
           - addonId: goldenCursor
           - addonId: ime_expressive
           - addonId: inputLock
-          - addonId: instantTranslate
+          - addonId: leanCalendar
           - addonId: numberProcessing
           - addonId: objWatcher
+          - addonId: polyglot
           - addonId: QQEnhancement
           - addonId: resourceMonitor
           - addonId: unmute
+            channel: beta
           - addonId: WeChatEnhancement
+          - addonId: winFormsNet48Fixes
           - addonId: withSounds
-          - addonId: WorldVoice
           - addonId: xyOCR
+    uses: ./.github/workflows/DownloadResource.yaml
+    with:
+      from-addonStore: true
+      addon-ID: ${{ matrix.addon.addonId }}
+      addon-channel: ${{ matrix.addon.channel || 'stable' }}
+
+  get-NVDA-info:
+    name: Get NVDA release info
+    runs-on: ubuntu-latest
+    outputs:
+      NVDAFilename: ${{ steps.get-release.outputs.nvda-filename }}
+      NVDAVersion: ${{ steps.get-release.outputs.nvda-version }}
+      download-url: ${{ steps.get-release.outputs.download-url }}
     steps:
-      - name: Download ${{ matrix.addon.addonId }}
-        uses: nvdacn/NVDA_Lazy_Edition/.github/actions/DownloadResource@master
-        with:
-          from-addonStore: true
-          addon-ID: ${{ matrix.addon.addonId }}
+      - name: Get NVDA release info
+        id: get-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          exclude_flags=(--exclude-drafts)
+          if [ "$BetaVersion" != "True" ]; then
+            exclude_flags+=(--exclude-pre-releases)
+          fi
+          tagName=$(gh release list --repo nvaccess/nvda --limit 1 "${exclude_flags[@]}" --json tagName --jq '.[0].tagName')
+          nvdaVersion="${tagName#release-}"
+          nvdaFilename="nvda_$nvdaVersion.exe"
+          echo "nvda-filename=$nvdaFilename" >> $GITHUB_OUTPUT
+          echo "nvda-version=$nvdaVersion" >> $GITHUB_OUTPUT
+          echo "download-url=https://download.nvaccess.org/releases/$nvdaVersion/$nvdaFilename" >> $GITHUB_OUTPUT
 
   download-NVDA:
     name: Download NVDA
-    runs-on: ubuntu-latest
-    env:
-      NVDA_RELEASES_BASE_URL: https://download.nvaccess.org/releases/
-    outputs:
-      NVDAFilename: nvda_${{ steps.nvda.outputs.replaced }}.exe
-      NVDAVersion: ${{ steps.nvda.outputs.replaced }}
-    steps:
-      - name: Get tag
-        id: nvda-tag
-        uses: pozetroninc/github-action-get-latest-release@master
-        with:
-          repository: nvaccess/nvda
-          excludes: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && !contains(github.ref, 'beta') && 'prerelease, draft' || '' }}
-      - name: Processing tag
-        id: nvda
-        uses: frabert/replace-string-action@v2
-        with:
-          pattern: 'release-(.*)'
-          string: ${{ steps.nvda-tag.outputs.release }}
-          replace-with: '$1'
-      - name: Download nvda_${{ steps.nvda.outputs.replaced }}.exe
-        uses: nvdacn/NVDA_Lazy_Edition/.github/actions/DownloadResource@master
-        with:
-          file-name: nvda_${{ steps.nvda.outputs.replaced }}.exe
-          file-url: ${{ env.NVDA_RELEASES_BASE_URL }}/${{ steps.nvda.outputs.replaced }}/nvda_${{ steps.nvda.outputs.replaced }}.exe
+    needs: get-NVDA-info
+    uses: ./.github/workflows/DownloadResource.yaml
+    with:
+      file-name: ${{ needs.get-NVDA-info.outputs.NVDAFilename }}
+      file-url: ${{ needs.get-NVDA-info.outputs.download-url }}
 
   build:
     name: Build NVDA Lazy Edition
     runs-on: windows-11-arm64
     needs:
+      - get-NVDA-info
       - download-NVDA
       - download-files
       - download-addons-from-addonStore
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
+      - name: Download ${{ needs.get-NVDA-info.outputs.NVDAFilename }}
+        uses: actions/download-artifact@v8
         with:
-          fetch-depth: 0
-      - name: Download ${{ needs.download-NVDA.outputs.NVDAFilename }}
-        uses: actions/download-artifact@v7
-        with:
-          name: ${{ needs.download-NVDA.outputs.NVDAFilename }}
-          path: ${{ github.workspace }}/Resource/
-      - name: Download vcredist_x86.exe
-        uses: actions/download-artifact@v7
-        with:
-          name: vcredist_x86.exe
+          name: ${{ needs.get-NVDA-info.outputs.NVDAFilename }}
           path: ${{ github.workspace }}/Resource/
       - name: Download Speech
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: ${{ github.workspace }}/Resource/speech/
           pattern: speech-*
           merge-multiple: true
       - name: Download Addons
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: ${{ github.workspace }}/Resource/Addons/
           pattern: "*.nvda-addon"
           merge-multiple: true
+      - name: Download ChineseSimplified.isl
+        uses: carlosperate/download-file-action@v2
+        with:
+          file-url: 'https://raw.githubusercontent.com/kira-96/Inno-Setup-Chinese-Simplified-Translation/main/ChineseSimplified.isl'
+          location: '${{ github.workspace }}/Resource/UILanguages'
       - name: Run the build script
-        run: ${{ github.workspace }}/Run.bat GITHUB_ACTIONS
+        run: |
+          tzutil /s "China Standard Time"
+          ${{ github.workspace }}/Run.bat Build
         env:
-          NVDAVersion: ${{ needs.download-NVDA.outputs.NVDAVersion }}
-          BetaVersion: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && !contains(github.ref, 'beta') && 'False' || 'True' }}
+          NVDAVersion: ${{ needs.get-NVDA-info.outputs.NVDAVersion }}
+          CreateArchive: ${{ startsWith(github.ref, 'refs/tags/') && 'True' || 'False' }}
       - name: Upload NVDA_Lazy_Edition
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
-          name: NVDA_Lazy_Edition
-          path: ${{ github.workspace }}/Build/NVDA*.exe
+          path: ${{ github.workspace }}/Build/NVDA_${{ env.NVDAVersion }}*.exe
+          archive: false
+      - name: Upload RestoreNVDAConfigurationTool
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v7
+        with:
+          path: '${{ github.workspace }}/Build/NVDA 配置恢复工具.exe'
+          archive: false
       - name: Upload Resource
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: Resource
           path: ${{ github.workspace }}/Resource
           compression-level: 0
       - name: Upload Archive
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: Archive
           path: ${{ github.workspace }}/Build/Archive/*
@@ -186,139 +184,41 @@ jobs:
       contents: write
     steps:
       - name: Download Archive
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: Archive
           path: NVDA_Lazy_Edition
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           body: 详细更新日志请[点此查看](documentation/changes.md)。
           files: NVDA_Lazy_Edition/*
           fail_on_unmatched_files: true
           prerelease: ${{ contains(github.ref, 'beta') }}
 
-  push_to_gitcode:
+  gitcode_push:
     name: Push to GitCode
-    runs-on: ubuntu-latest
     if: ${{ startsWith(github.ref, 'refs/tags/') && vars.GITCODE_USERNAME }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          ref: master
-      - name: Push to GitCode
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "github-actions@github.com"
-          git remote add gitcode https://${{ vars.GITCODE_USERNAME }}:${{ secrets.GITCODE_TOKEN }}@gitcode.com/${{ env.GITCODE_REPOSITORY }}.git
-          git push gitcode --tags --force master:master
+    uses: nvdacn/sync_to_gitcode/.github/workflows/PushToGitCode.yaml@master
+    with:
+      gitcode_username: ${{ vars.GITCODE_USERNAME }}
+      gitcode_repository: ${{ vars.GITCODE_REPOSITORY }}
+    secrets:
+      GITCODE_TOKEN: ${{ secrets.GITCODE_TOKEN }}
 
   gitcode_release:
     name: Create Release on GitCode
-    runs-on: ubuntu-latest
-    needs:
-      - push_to_gitcode
+    needs: 
+      - gitcode_push
       - build
-    env:
-      TAG_NAME: ${{ github.ref_name }}
-    steps:
-      - name: Download Archive
-        uses: actions/download-artifact@v6
-        with:
-          name: Archive
-          path: .
-      - name: Check if Release exists on GitCode
-        id: check_release
-        run: |
-          RESPONSE=$(curl -L -sS -o /dev/null -w "%{http_code}" \
-            -H 'PRIVATE-TOKEN: ${{ secrets.GITCODE_TOKEN }}' \
-            -H "Accept: application/json" \
-            "https://api.gitcode.com/api/v5/repos/${{ env.GITCODE_REPOSITORY }}/releases/tags/${{ env.TAG_NAME }}")
-          if [ "$RESPONSE" = "200" ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-            echo "Release already exists on GitCode"
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-            echo "Release does not exist on GitCode"
-          fi
-      - name: Create Release on GitCode
-        if: steps.check_release.outputs.exists == 'false'
-        id: create_release
-        run: |
-          echo "Creating new release on GitCode..."
-          RESPONSE=$(curl -L -o response.json -sS -w "%{http_code}" \
-            -X POST \
-            -H 'PRIVATE-TOKEN: ${{ secrets.GITCODE_TOKEN }}' \
-            -H "Content-Type: application/json" \
-            -H "Accept: application/json" \
-            -d '{
-              "tag_name": "'"${{ env.TAG_NAME }}"'",
-              "target_commitish": "master",
-              "name": "${{ env.TAG_NAME }}",
-              "body": "详细更新日志请[点此查看](https://gitcode.com/${{ env.GITCODE_REPOSITORY }}/blob/${{ env.TAG_NAME }}/documentation/changes.md)。",
-              "prerelease": '${{ contains(github.ref, 'beta') }}'
-            }' \
-            "https://api.gitcode.com/api/v5/repos/${{ env.GITCODE_REPOSITORY }}/releases")
-          if [ "$RESPONSE" = "200" ]; then
-            echo "✅ Release created successfully on GitCode"
-          else
-            echo "❌ Failed to create release. Response code: $RESPONSE"
-            cat response.json
-            exit 1
-          fi
-      - name: Update Release on GitCode
-        if: steps.check_release.outputs.exists == 'true'
-        id: update_release
-        run: |
-          echo "Updating existing release on GitCode..."
-          RESPONSE=$(curl -L -o response.json -sS -w "%{http_code}" \
-            -X PATCH \
-            -H 'PRIVATE-TOKEN: ${{ secrets.GITCODE_TOKEN }}' \
-            -H "Content-Type: application/json" \
-            -H "Accept: application/json" \
-            -d '{
-              "tag_name": "'"${{ env.TAG_NAME }}"'",
-              "name": "${{ env.TAG_NAME }}",
-              "body": "详细更新日志请[点此查看](https://gitcode.com/${{ env.GITCODE_REPOSITORY }}/blob/${{ env.TAG_NAME }}/documentation/changes.md)。",
-              "prerelease": '${{ contains(github.ref, 'beta') }}'
-            }' \
-            "https://api.gitcode.com/api/v5/repos/${{ env.GITCODE_REPOSITORY }}/releases/${{ env.TAG_NAME }}")
-          if [ "$RESPONSE" = "200" ]; then
-            echo "✅ Release updated successfully on GitCode"
-          else
-            echo "❌ Failed to update release. Response code: $RESPONSE"
-            cat response.json
-            exit 1
-          fi
-      - name: Upload Build Artifacts to Release
-        run: |
-          for file in NVDA_Lazy_Edition*.zip; do
-            echo "Uploading $file..."
-            UPLOAD_INFO=$(curl -sS \
-              -H 'PRIVATE-TOKEN: ${{ secrets.GITCODE_TOKEN }}' \
-              -H "Accept: application/json" \
-              "https://api.gitcode.com/api/v5/repos/${{ env.GITCODE_REPOSITORY }}/releases/${{ env.TAG_NAME }}/upload_url?file_name=$file")
-            UPLOAD_URL=$(echo "$UPLOAD_INFO" | jq -r '.url')
-            CURL_HEADERS=()
-            HEADERS_JSON=$(echo "$UPLOAD_INFO" | jq -r '.headers // empty')
-            if [ -n "$HEADERS_JSON" ] && [ "$HEADERS_JSON" != "null" ]; then
-              while IFS='' read -r line; do
-                if [ -n "$line" ]; then
-                  CURL_HEADERS+=("-H" "$line")
-                fi
-              done < <(echo "$HEADERS_JSON" | jq -r 'to_entries[] | "\(.key): \(.value)"')
-            fi
-            RESPONSE=$(curl -X PUT -w "%{http_code}" -o "$file.response.json" --retry 3 \
-              -T "$file" \
-              "${CURL_HEADERS[@]}" \
-              "$UPLOAD_URL")
-            if [ "$RESPONSE" -ne 200 ]; then
-              echo "❌ Failed to upload $file. Response code: $RESPONSE"
-              cat "$file.response.json"
-              exit 1
-            else
-              echo "✅ Uploaded $file successfully"
-            fi
-          done
+    uses: nvdacn/sync_to_gitcode/.github/workflows/CreateReleaseOnGitCode.yaml@master
+    with:
+      artifact_name: Archive
+      gitcode_repository: ${{ vars.GITCODE_REPOSITORY }}
+      tag_name: ${{ github.ref_name }}
+      prerelease: ${{ contains(github.ref, 'beta') }}
+      body: |
+        详细更新日志请[点此查看](https://gitcode.com/${{ vars.GITCODE_REPOSITORY }}/blob/${{ github.ref_name }}/documentation/changes.md)。
+      file_name: NVDA_Lazy_Edition*.zip
+    secrets:
+      GITCODE_TOKEN: ${{ secrets.GITCODE_TOKEN }}
